@@ -1,6 +1,7 @@
 package lti
 
 import (
+	"fmt"
 	"testing"
 
 	"gonum.org/v1/gonum/mat"
@@ -23,5 +24,80 @@ func TestDiscretize(t *testing.T) {
 	if !mat.EqualApprox(md, correct, 1e-4) {
 		t.Error("Discretize does not return correct matrix")
 	}
+}
 
+func TestRank(t *testing.T) {
+	var config = []struct {
+		M    *mat.Dense
+		Rank int
+	}{
+		{
+			M:    mat.NewDense(2, 2, []float64{0, 1, 0, 0}),
+			Rank: 1,
+		},
+		{
+			M:    mat.NewDense(2, 2, []float64{1, 0, 0, 1}),
+			Rank: 2,
+		},
+		{
+			M: mat.NewDense(3, 3, []float64{
+				1, 2, 3,
+				0, 4, 6,
+				0, 0, 9,
+			}),
+			Rank: 3,
+		},
+		{
+			M: mat.NewDense(3, 3, []float64{
+				1, 2, 3,
+				0, 4, 6,
+				0, 6, 9,
+			}),
+			Rank: 2,
+		},
+		{
+			M: mat.NewDense(3, 3, []float64{
+				1, 2, 3,
+				2, 4, 6,
+				3, 6, 9,
+			}),
+			Rank: 1,
+		},
+		{
+			M: mat.NewDense(4, 2, []float64{
+				1, 2,
+				0, 4,
+				3, 0,
+				4, 0,
+			}),
+			Rank: 2,
+		},
+		{
+			M: mat.NewDense(4, 2, []float64{
+				0, 2,
+				0, 4,
+				3, 0,
+				4, 0,
+			}),
+			Rank: 2,
+		},
+		{
+			M: mat.NewDense(4, 2, []float64{
+				1, 2,
+				2, 4,
+				3, 6,
+				4, 8,
+			}),
+			Rank: 1,
+		},
+	}
+
+	for _, cfg := range config {
+		if r, _ := rank(cfg.M); r != cfg.Rank {
+			fmt.Println("m=", cfg.M)
+			fmt.Println("expected:", cfg.Rank)
+			fmt.Println("received:", r)
+			t.Error("rank failed")
+		}
+	}
 }

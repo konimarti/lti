@@ -78,3 +78,87 @@ func TestDerivative(t *testing.T) {
 	}
 
 }
+
+func TestControllable(t *testing.T) {
+
+	var config = []struct {
+		A    *mat.Dense
+		B    *mat.Dense
+		Want bool
+	}{
+		{
+			A: mat.NewDense(3, 3, []float64{
+				0, 1, 0,
+				0, 0, 1,
+				0, 0, 0}),
+			B: mat.NewDense(3, 1, []float64{
+				0, 0, 0}),
+			Want: false,
+		},
+		{
+			A: mat.NewDense(2, 2, []float64{
+				0, 1,
+				0, 0}),
+			B: mat.NewDense(2, 1, []float64{
+				0, 1}),
+			Want: true,
+		},
+	}
+
+	sys := Discrete{}
+
+	for _, cfg := range config {
+		sys.A = cfg.A
+		sys.B = cfg.B
+		if ok, _ := sys.Controllable(); ok != cfg.Want {
+			fmt.Println("A=", cfg.A)
+			fmt.Println("B=", cfg.B)
+			fmt.Println("received:", ok)
+			fmt.Println("expected:", cfg.Want)
+			t.Error("controllable failed")
+		}
+	}
+
+}
+
+func TestObservable(t *testing.T) {
+
+	var config = []struct {
+		A    *mat.Dense
+		C    *mat.Dense
+		Want bool
+	}{
+		{
+			A: mat.NewDense(2, 2, []float64{
+				0, 1,
+				0, 0}),
+			C: mat.NewDense(1, 2, []float64{
+				1, 0}),
+			Want: true,
+		},
+		{
+			A: mat.NewDense(3, 3, []float64{
+				0, 1, 0,
+				0, 0, 1,
+				0, 0, 0}),
+			C: mat.NewDense(1, 3, []float64{
+				0, 1, 0}),
+			Want: false,
+		},
+	}
+
+	sys := Discrete{}
+
+	for _, cfg := range config {
+		sys.A = cfg.A
+		sys.C = cfg.C
+		if ok, _ := sys.Observable(); ok != cfg.Want {
+			fmt.Println("A=", cfg.A)
+			fmt.Println("C=", cfg.C)
+			fmt.Println("received:", ok)
+			fmt.Println("expected:", cfg.Want)
+			t.Error("observable failed")
+		}
+	}
+
+}

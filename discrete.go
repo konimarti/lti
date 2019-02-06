@@ -118,3 +118,73 @@ func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 
 	return &yk
 }
+
+// Controllable checks the controllability of the LTI system.
+func (d *Discrete) Controllable() (bool, error) {
+	// system is controllable if
+	// rank( [B, A B, A^2 B, A^n-1 B] ) = n
+
+	// controllability matrix
+	n, _ := d.B.Dims()
+
+	var c, ab mat.Dense
+	c.Clone(d.B)
+	ab.Clone(d.B)
+
+	// create augmented matrix
+	for i := 0; i < n-1; i++ {
+		ab.Mul(d.A, &ab)
+		var tmp mat.Dense
+		tmp.Augment(&c, &ab)
+		c.Clone(&tmp)
+	}
+	//fmt.Println(c)
+
+	// calculate rank
+	rank, err := rank(&c)
+	if err != nil {
+		return false, err
+	}
+	//fmt.Println("rank(C)=", rank)
+
+	// check
+	if rank < n {
+		return false, nil
+	}
+	return true, nil
+}
+
+// Observable checks the observability of the LTI system.
+func (d *Discrete) Observable() (bool, error) {
+	// system is observable if
+	// rank( S=[C, C A, C A^2, ..., C A^n-1]' ) = n
+
+	// observability matrix S
+	_, n := d.C.Dims()
+
+	var s, ca mat.Dense
+	s.Clone(d.C)
+	ca.Clone(d.C)
+
+	// create stacked matrix
+	for i := 0; i < n-1; i++ {
+		ca.Mul(&ca, d.A)
+		var tmp mat.Dense
+		tmp.Stack(&s, &ca)
+		s.Clone(&tmp)
+	}
+	//fmt.Println("S=", s)
+
+	// calculate rank
+	rank, err := rank(&s)
+	if err != nil {
+		return false, err
+	}
+	//fmt.Println("rank(S)=", rank)
+
+	// check
+	if rank < n {
+		return false, nil
+	}
+	return true, nil
+}

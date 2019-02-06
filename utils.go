@@ -48,3 +48,19 @@ func integrate(ad *mat.Dense, a *mat.Dense, b *mat.Dense, t float64) (*mat.Dense
 
 	return &bd, nil
 }
+
+// rank calculates rank of matrix
+func rank(a *mat.Dense) (int, error) {
+	var svd mat.SVD
+	ok := svd.Factorize(a, mat.SVDNone)
+	if !ok {
+		return 0, errors.New("rank: factorization failed")
+	}
+	rank := 0
+	for _, value := range svd.Values(nil) {
+		if value > 1e-8 {
+			rank += 1
+		}
+	}
+	return rank, nil
+}
