@@ -6,6 +6,7 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+//Discrete represents a discrete LTI system
 type Discrete struct {
 	A *mat.Dense
 	B *mat.Dense
@@ -13,6 +14,7 @@ type Discrete struct {
 	D *mat.Dense
 }
 
+//NewDiscrete returns a Discrete struct and checks the matrix dimensions
 func NewDiscrete(A, B, C, D *mat.Dense) (*Discrete, error) {
 
 	// A (n x n)
@@ -49,6 +51,7 @@ func NewDiscrete(A, B, C, D *mat.Dense) (*Discrete, error) {
 	}, nil
 }
 
+//Derivative returns the derivative vetor x'(t) = A * x(t) + B * u(t)
 func (d *Discrete) Derivative(x, u *mat.VecDense) *mat.VecDense {
 	// x'(t) = A * x(t) + B * u(t)
 
@@ -67,7 +70,7 @@ func (d *Discrete) Derivative(x, u *mat.VecDense) *mat.VecDense {
 	return &xderiv
 }
 
-// Propagte state to x(k+1) = A_d * x + B_d * u
+// Propagate state x(k) by a time step dt to x(k+1) = A_discretized * x + B_discretized * u
 func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat.VecDense, error) {
 
 	// A_d = exp(A*dt)
@@ -90,7 +93,7 @@ func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat
 	return &xk1, nil
 }
 
-//Response y(k) = C * xk + D * uk
+//Response returns the output vector y(t) = C * x(t) + D * u(t)
 func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 
 	// cx = C * x
@@ -101,7 +104,7 @@ func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	var du mat.VecDense
 	du.MulVec(d.D, u)
 
-	// y(k) = C * xk + D * uk
+	// y(t) = C * x(t) + D * u(t)
 	var yk mat.VecDense
 	yk.AddVec(&cx, &du)
 
