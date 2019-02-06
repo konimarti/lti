@@ -6,7 +6,15 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-//Discrete represents a discrete LTI system
+// Discrete represents a discrete LTI system.
+//
+// The parameters are:
+// 	A: System matrix
+// 	B: Control matrix
+// 	C: Output matrix
+// 	D: Feedforward matrix
+//
+//
 type Discrete struct {
 	A *mat.Dense
 	B *mat.Dense
