@@ -7,7 +7,8 @@ import (
 )
 
 //Discretize
-func Discretize(m *mat.Dense, t float64) (*mat.Dense, error) {
+// A_d = exp(A * t)
+func discretize(m *mat.Dense, t float64) (*mat.Dense, error) {
 	// m_d = exp(m * t)
 
 	// check if matrix m is square
@@ -29,7 +30,7 @@ func Discretize(m *mat.Dense, t float64) (*mat.Dense, error) {
 // Integrate
 // Source: https://math.stackexchange.com/questions/658276/integral-of-matrix-exponential
 // Int_0^T exp(A t) B dt = T [ exp(AT) - AT ] * B
-func Integrate(ad *mat.Dense, a *mat.Dense, b *mat.Dense, t float64) (*mat.Dense, error) {
+func integrate(ad *mat.Dense, a *mat.Dense, b *mat.Dense, t float64) (*mat.Dense, error) {
 
 	// (At)
 	var at mat.Dense

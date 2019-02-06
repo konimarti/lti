@@ -71,14 +71,14 @@ func (d *Discrete) Derivative(x, u *mat.VecDense) *mat.VecDense {
 func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat.VecDense, error) {
 
 	// A_d = exp(A*dt)
-	ad, err := Discretize(d.A, dt)
+	ad, err := discretize(d.A, dt)
 	if err != nil {
 		return nil, errors.New("discretization of A failed")
 	}
 	//fmt.Println("A_d=", ad)
 
 	// B_d = Int_0^T exp(A*dt) * B dt
-	bd, _ := Integrate(ad, d.A, d.B, dt)
+	bd, _ := integrate(ad, d.A, d.B, dt)
 	//fmt.Println("B_d=", bd)
 
 	// x(k+1) = A_d * x + B_d * u
