@@ -1,5 +1,5 @@
-// A general state-space representation of a linear system can be expressed
-// in a matrix form as
+// Package lti implements a general state-space representation of a linear system.
+// A state-space representation can be expressed in a matrix form as
 //
 // x'(t) = A * x(t) + B * u(t)
 // and

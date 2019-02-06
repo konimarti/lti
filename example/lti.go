@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// definie system type (state-space model)
+	// define system type (state-space model)
 	system, err := lti.NewDiscrete(
 		mat.NewDense(2, 2, []float64{0, 1, 0, 0}), // A: System matrix
 		mat.NewDense(2, 1, []float64{0, 1}),       // B: Control matrix

@@ -8,7 +8,7 @@
 
 ## Usage
 ```go
-	// definie system type (state-space model)
+	// define system type (state-space model)
 	system, err := lti.NewDiscrete(
 		...
 	)

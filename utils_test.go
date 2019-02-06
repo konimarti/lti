@@ -18,7 +18,7 @@ func TestDiscretize(t *testing.T) {
 
 	// check for correct calculation
 	m := mat.NewDense(2, 2, []float64{1, 0, 0, 1})
-	md, err := discretize(m, dt)
+	md, _ := discretize(m, dt)
 	correct := mat.NewDense(2, 2, []float64{1.1052, 0.0, 0.0, 1.1052})
 	if !mat.EqualApprox(md, correct, 1e-4) {
 		t.Error("Discretize does not return correct matrix")
