@@ -49,10 +49,6 @@ func TestResponse(t *testing.T) {
 	state := mat.NewVecDense(2, []float64{1.1, 1}) // x = position, velocity
 	input := mat.NewVecDense(1, []float64{2})      // u = accelartion
 	response := sys.Response(state, input)
-	if err != nil {
-		fmt.Println(err)
-		t.Error("Response returned error")
-	}
 
 	//
 	expected := mat.NewVecDense(1, []float64{1.1})
@@ -61,4 +57,24 @@ func TestResponse(t *testing.T) {
 		fmt.Println("Expected:", expected)
 		t.Error("Response returned wrong state")
 	}
+}
+
+func TestDerivative(t *testing.T) {
+	sys, err := NewSystem()
+	if err != nil {
+		t.Error("Internal error in creating test system")
+	}
+
+	state := mat.NewVecDense(2, []float64{1.1, 1}) // x = position, velocity
+	input := mat.NewVecDense(1, []float64{2})      // u = accelartion
+	deriv := sys.Derivative(state, input)
+
+	//
+	expected := mat.NewVecDense(2, []float64{1, 2})
+	if !mat.EqualApprox(deriv, expected, 1e-4) {
+		fmt.Println("Returned:", deriv)
+		fmt.Println("Expected:", expected)
+		t.Error("Response returned wrong state")
+	}
+
 }

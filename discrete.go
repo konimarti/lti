@@ -2,7 +2,6 @@ package lti
 
 import (
 	"errors"
-	"fmt"
 
 	"gonum.org/v1/gonum/mat"
 )
@@ -50,6 +49,24 @@ func NewDiscrete(A, B, C, D *mat.Dense) (*Discrete, error) {
 	}, nil
 }
 
+func (d *Discrete) Derivative(x, u *mat.VecDense) *mat.VecDense {
+	// x'(t) = A * x(t) + B * u(t)
+
+	// A * x(t)
+	var ax mat.VecDense
+	ax.MulVec(d.A, x)
+
+	// B * u(t)
+	var bx mat.VecDense
+	bx.MulVec(d.B, u)
+
+	// xderiv = A x(t) + B u(t)
+	var xderiv mat.VecDense
+	xderiv.AddVec(&ax, &bx)
+
+	return &xderiv
+}
+
 // Propagte state to x(k+1) = A_d * x + B_d * u
 func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat.VecDense, error) {
 
@@ -58,13 +75,11 @@ func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat
 	if err != nil {
 		return nil, errors.New("discretization of A failed")
 	}
-
-	fmt.Println("A_d=", ad)
+	//fmt.Println("A_d=", ad)
 
 	// B_d = Int_0^T exp(A*dt) * B dt
 	bd, _ := Integrate(ad, d.A, d.B, dt)
-
-	fmt.Println("B_d=", bd)
+	//fmt.Println("B_d=", bd)
 
 	// x(k+1) = A_d * x + B_d * u
 	var xk1, adx, bdu mat.VecDense
