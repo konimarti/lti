@@ -16,7 +16,7 @@ func NewSystem() (*Discrete, error) {
 	)
 }
 
-func TestPropagte(t *testing.T) {
+func TestPropagate(t *testing.T) {
 	sys, err := NewSystem()
 	if err != nil {
 		t.Error("Internal error in creating test system")

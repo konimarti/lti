@@ -7,17 +7,17 @@ import (
 )
 
 //Discretize
-func Discretize(m *mat.Dense, dt float64) (*mat.Dense, error) {
-	// m_d = exp(m * dt)
+func Discretize(m *mat.Dense, t float64) (*mat.Dense, error) {
+	// m_d = exp(m * t)
 
 	// check if matrix m is square
 	if r, c := m.Dims(); r != c {
 		return m, errors.New("Discretize: matrix is not square")
 	}
 
-	// tmp = m * dt
+	// tmp = m * t
 	var tmp mat.Dense
-	tmp.Scale(dt, m)
+	tmp.Scale(t, m)
 
 	// exp( tmp )
 	var md mat.Dense
@@ -28,17 +28,12 @@ func Discretize(m *mat.Dense, dt float64) (*mat.Dense, error) {
 
 // Integrate
 // Source: https://math.stackexchange.com/questions/658276/integral-of-matrix-exponential
-// Int_0^T exp(A * t) * B dt = T [ exp(AT) - AT ] * B
-func Integrate(a *mat.Dense, b *mat.Dense, dt float64) (*mat.Dense, error) {
-	// exp(A t)
-	ad, err := Discretize(a, dt)
-	if err != nil {
-		return nil, errors.New("discretization failed")
-	}
+// Int_0^T exp(A t) B dt = T [ exp(AT) - AT ] * B
+func Integrate(ad *mat.Dense, a *mat.Dense, b *mat.Dense, t float64) (*mat.Dense, error) {
 
 	// (At)
 	var at mat.Dense
-	at.Scale(dt, a)
+	at.Scale(t, a)
 
 	// exp(A t) - At
 	var diff mat.Dense
@@ -48,7 +43,7 @@ func Integrate(a *mat.Dense, b *mat.Dense, dt float64) (*mat.Dense, error) {
 	var bd mat.Dense
 	bd.Mul(&diff, b)
 
-	bd.Scale(dt, &bd)
+	bd.Scale(t, &bd)
 
 	return &bd, nil
 }

@@ -50,8 +50,8 @@ func NewDiscrete(A, B, C, D *mat.Dense) (*Discrete, error) {
 	}, nil
 }
 
+// Propagte state to x(k+1) = A_d * x + B_d * u
 func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat.VecDense, error) {
-	// x(k+1) = A_d * x + B_d * u
 
 	// A_d = exp(A*dt)
 	ad, err := Discretize(d.A, dt)
@@ -61,13 +61,8 @@ func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat
 
 	fmt.Println("A_d=", ad)
 
-	// B_d = exp(A*dt) * B
-	/* Ideale Abtastung
-	var bd mat.Dense
-	bd.Mul(ad, d.B)
-	*/
-	// integrate
-	bd, _ := Integrate(d.A, d.B, dt)
+	// B_d = Int_0^T exp(A*dt) * B dt
+	bd, _ := Integrate(ad, d.A, d.B, dt)
 
 	fmt.Println("B_d=", bd)
 
@@ -80,8 +75,8 @@ func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat
 	return &xk1, nil
 }
 
+//Response y(k) = C * xk + D * uk
 func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
-	// y(k) = C * xk + D * uk
 
 	// cx = C * x
 	var cx mat.VecDense
