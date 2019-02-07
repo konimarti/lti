@@ -9,182 +9,44 @@ import (
 // Discrete represents a discrete LTI system.
 //
 // The parameters are:
-// 	A: System matrix
-// 	B: Control matrix
-// 	C: Output matrix
-// 	D: Feedforward matrix
+// 	A_d: Discretized Ssystem matrix
+// 	B_d: Discretized Control matrix
 //
 //
 type Discrete struct {
-	A *mat.Dense
-	B *mat.Dense
-	C *mat.Dense
-	D *mat.Dense
+	Ad *mat.Dense
+	Bd *mat.Dense
 }
 
-//NewDiscrete returns a Discrete struct and checks the matrix dimensions
-func NewDiscrete(A, B, C, D *mat.Dense) (*Discrete, error) {
-
-	// A (n x n)
-	ar, ac := A.Dims()
-	if ar != ac {
-		return nil, errors.New("A should be squared")
-	}
-	// B (n x k)
-	br, bc := B.Dims()
-	if br != ar {
-		return nil, errors.New("B row should be equal to A row dim")
-	}
-
-	// C (l x n)
-	cr, cc := C.Dims()
-	if cc != ar {
-		return nil, errors.New("C col should be equal to A row dim")
-	}
-
-	// D (l x k)
-	dr, dc := D.Dims()
-	if dr != cr {
-		return nil, errors.New("D row should be equal to C row dim")
-	}
-	if dc != bc {
-		return nil, errors.New("D col should be equal to B col dim")
-	}
-
-	return &Discrete{
-		A: A,
-		B: B,
-		C: C,
-		D: D,
-	}, nil
-}
-
-//Derivative returns the derivative vetor x'(t) = A * x(t) + B * u(t)
-func (d *Discrete) Derivative(x, u *mat.VecDense) *mat.VecDense {
-	// x'(t) = A * x(t) + B * u(t)
-
-	// A * x(t)
-	var ax mat.VecDense
-	ax.MulVec(d.A, x)
-
-	// B * u(t)
-	var bx mat.VecDense
-	bx.MulVec(d.B, u)
-
-	// xderiv = A x(t) + B u(t)
-	var xderiv mat.VecDense
-	xderiv.AddVec(&ax, &bx)
-
-	return &xderiv
-}
-
-// Propagate state x(k) by a time step dt to x(k+1) = A_discretized * x + B_discretized * u
-func (d *Discrete) Propagate(dt float64, x *mat.VecDense, u *mat.VecDense) (*mat.VecDense, error) {
+//NewDiscrete returns a Discrete struct
+func NewDiscrete(A, B *mat.Dense, dt float64) (*Discrete, error) {
 
 	// A_d = exp(A*dt)
-	ad, err := discretize(d.A, dt)
+	ad, err := discretize(A, dt)
 	if err != nil {
 		return nil, errors.New("discretization of A failed")
 	}
-	//fmt.Println("A_d=", ad)
 
 	// B_d = Int_0^T exp(A*dt) * B dt
-	bd, _ := integrate(ad, d.A, d.B, dt)
-	//fmt.Println("B_d=", bd)
+	bd, err := integrate(A, B, dt)
+	if err != nil {
+		return nil, errors.New("discretization of B failed")
+	}
+
+	return &Discrete{
+		Ad: ad,
+		Bd: bd,
+	}, nil
+}
+
+// Propagate state x(k) by a time step dt to x(k+1) = A_discretized * x + B_discretized * u
+func (d *Discrete) Propagate(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 
 	// x(k+1) = A_d * x + B_d * u
 	var xk1, adx, bdu mat.VecDense
-	adx.MulVec(ad, x)
-	bdu.MulVec(bd, u)
+	adx.MulVec(d.Ad, x)
+	bdu.MulVec(d.Bd, u)
 	xk1.AddVec(&adx, &bdu)
 
-	return &xk1, nil
-}
-
-//Response returns the output vector y(t) = C * x(t) + D * u(t)
-func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
-
-	// cx = C * x
-	var cx mat.VecDense
-	cx.MulVec(d.C, x)
-
-	// du = D * u
-	var du mat.VecDense
-	du.MulVec(d.D, u)
-
-	// y(t) = C * x(t) + D * u(t)
-	var yk mat.VecDense
-	yk.AddVec(&cx, &du)
-
-	return &yk
-}
-
-// Controllable checks the controllability of the LTI system.
-func (d *Discrete) Controllable() (bool, error) {
-	// system is controllable if
-	// rank( [B, A B, A^2 B, A^n-1 B] ) = n
-
-	// controllability matrix
-	n, _ := d.B.Dims()
-
-	var c, ab mat.Dense
-	c.Clone(d.B)
-	ab.Clone(d.B)
-
-	// create augmented matrix
-	for i := 0; i < n-1; i++ {
-		ab.Mul(d.A, &ab)
-		var tmp mat.Dense
-		tmp.Augment(&c, &ab)
-		c.Clone(&tmp)
-	}
-	//fmt.Println(c)
-
-	// calculate rank
-	rank, err := rank(&c)
-	if err != nil {
-		return false, err
-	}
-	//fmt.Println("rank(C)=", rank)
-
-	// check
-	if rank < n {
-		return false, nil
-	}
-	return true, nil
-}
-
-// Observable checks the observability of the LTI system.
-func (d *Discrete) Observable() (bool, error) {
-	// system is observable if
-	// rank( S=[C, C A, C A^2, ..., C A^n-1]' ) = n
-
-	// observability matrix S
-	_, n := d.C.Dims()
-
-	var s, ca mat.Dense
-	s.Clone(d.C)
-	ca.Clone(d.C)
-
-	// create stacked matrix
-	for i := 0; i < n-1; i++ {
-		ca.Mul(&ca, d.A)
-		var tmp mat.Dense
-		tmp.Stack(&s, &ca)
-		s.Clone(&tmp)
-	}
-	//fmt.Println("S=", s)
-
-	// calculate rank
-	rank, err := rank(&s)
-	if err != nil {
-		return false, err
-	}
-	//fmt.Println("rank(S)=", rank)
-
-	// check
-	if rank < n {
-		return false, nil
-	}
-	return true, nil
+	return &xk1
 }

@@ -26,6 +26,37 @@ func TestDiscretize(t *testing.T) {
 	}
 }
 
+func TestIntegrate(t *testing.T) {
+	dt := 0.1
+
+	a := mat.NewDense(3, 3, []float64{
+		0, 1, 0,
+		0, 0, 1,
+		0, 0, 0,
+	})
+	b := mat.NewDense(3, 1, []float64{
+		0,
+		0,
+		1,
+	})
+
+	bd, err := integrate(a, b, dt)
+	if err != nil {
+		t.Error("failed to integrate")
+	}
+
+	correct := mat.NewDense(3, 1, []float64{
+		1.0 / 6.0 * dt * dt * dt,
+		0.5 * dt * dt,
+		dt,
+	})
+	if !mat.EqualApprox(bd, correct, 1e-4) {
+		fmt.Println("received:", bd)
+		fmt.Println("expected:", correct)
+		t.Error("Integrate does not return correct matrix")
+	}
+}
+
 func TestRank(t *testing.T) {
 	var config = []struct {
 		M    *mat.Dense

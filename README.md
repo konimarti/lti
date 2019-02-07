@@ -8,6 +8,15 @@
 
 * State-space representation and estimation of linear, time-invariant (LTI) systems for control theory in Golang
 
+	```math
+	 x'(t) = A * x(t) + B * u(t)
+	```
+	 and
+	```math
+	 y(t)  = C * x(t) + D * u(t)
+	```
+
+
 ## Usage
 ```go
 	// define system type (state-space model)
@@ -34,14 +43,9 @@
 
 See example [here](example/lti.go).
 
-## State-space models
+## More information
 
-The following system types are implemented:
-* ```lti.Discrete{}```: Discrete, time-invariant
-
-### Understanding state-space models for control theory
-
-For additional materials on state-space models check out the following links:
+For additional materials on state-space models for control theory, check out the following links:
 * A practical to state-space control [here](https://github.com/calcmogul/state-space-guide)
 * State-space model impelmentation for Arduinos [here](https://github.com/tomstewart89/StateSpaceControl)
 
