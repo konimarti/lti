@@ -6,7 +6,7 @@
 
 ```go get github.com/konimarti/lti```
 
-* State-space representation and estimation of linear, time-invariant (LTI) systems for control theory in Golang
+State-space representation and estimation of linear, time-invariant (LTI) systems for control theory in Golang
 
 	```math
 	 x'(t) = A * x(t) + B * u(t)
@@ -20,9 +20,13 @@
 ## Usage
 ```go
 	// define system type (state-space model)
-	system, err := lti.NewDiscrete(
+	system, err := lti.NewSystem(
 		...
 	)
+
+	// check system properties
+	fmt.Println("Observable=", system.MustObservable())
+	fmt.Println("Controllable=", system.MustControllable())
 
 	// define initial state (x) and control (u) vectors
 	...
@@ -31,11 +35,15 @@
 	nextState, err := system.Propagate(dt, x, u)
 
 	// get derivative vector for new state
-	fmt.Println(system.Derivative(nextState, u))
-	
-	// get output vector for new state
-	fmt.Println(system.Response(nextState, u))
+	fmt.Println(system.Derivative(x, u))
 
+	// get output vector for new state
+	fmt.Println(system.Response(x, u))
+
+	// discretize LTI system and propagate state by time step 
+	discrete, err := lti.NewDiscrete(system.A, system.B, 0.1)
+
+	fmt.Println("x(k+1)=", discrete.Propagate(x, u))
 }
 ```
 
