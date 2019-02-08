@@ -77,7 +77,7 @@ func rank(a *mat.Dense) (int, error) {
 	rank := 0
 	for _, value := range svd.Values(nil) {
 		if value > 1e-8 {
-			rank += 1
+			rank++
 		}
 	}
 	return rank, nil

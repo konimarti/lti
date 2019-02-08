@@ -16,8 +16,15 @@ package lti
 
 import "gonum.org/v1/gonum/mat"
 
+//LTI represents a general time-continuous state-space LTI system
 type LTI interface {
 	Observable() (bool, error)
 	Controllable() (bool, error)
 	Response(x, u *mat.VecDense) *mat.VecDense
+}
+
+//DiscreteLTI represents a discretized LTI system
+type DiscreteLTI interface {
+	LTI
+	Propagate(x, u *mat.VecDense) *mat.VecDense
 }

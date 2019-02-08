@@ -60,3 +60,17 @@ func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	// y(t) = C * x(t) + D * u(t)
 	return multAndSumOp(d.C, x, d.D, u)
 }
+
+// Controllable checks the controllability of the LTI system.
+func (d *Discrete) Controllable() (bool, error) {
+	// system is controllable if
+	// rank( [B, A B, A^2 B, A^n-1 B] ) = n
+	return checkControllability(d.Ad, d.Bd)
+}
+
+// Observable checks the observability of the LTI system.
+func (d *Discrete) Observable() (bool, error) {
+	// system is observable if
+	// rank( S=[C, C A, C A^2, ..., C A^n-1]' ) = n
+	return checkObservability(d.Ad, d.C)
+}
