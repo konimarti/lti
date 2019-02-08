@@ -41,6 +41,6 @@ func main() {
 	}
 	fmt.Println("A_d=", discrete.Ad)
 	fmt.Println("B_d=", discrete.Bd)
-	fmt.Println("x(k+1)=", discrete.Propagate(x, u))
+	fmt.Println("x(k+1)=", discrete.Predict(x, u))
 
 }

@@ -19,7 +19,7 @@ func NewTestDiscrete() (*Discrete, error) {
 	return sys.Discretize(dt)
 }
 
-func TestPropagate(t *testing.T) {
+func TestPredict(t *testing.T) {
 	sys, err := NewTestDiscrete()
 	if err != nil {
 		t.Error("Internal error in creating test system")
@@ -27,10 +27,10 @@ func TestPropagate(t *testing.T) {
 
 	state := mat.NewVecDense(2, []float64{0, 1}) // x = position, velocity
 	input := mat.NewVecDense(1, []float64{2})    // u = accelartion
-	newState := sys.Propagate(state, input)
+	newState := sys.Predict(state, input)
 	if err != nil {
 		fmt.Println(err)
-		t.Error("Propagate returned error")
+		t.Error("Predict returned error")
 	}
 
 	//
@@ -38,6 +38,6 @@ func TestPropagate(t *testing.T) {
 	if !mat.EqualApprox(newState, expectedState, 1e-4) {
 		fmt.Println("Returned:", newState)
 		fmt.Println("Expected:", expectedState)
-		t.Error("Propagate returned wrong state")
+		t.Error("Predict returned wrong state")
 	}
 }

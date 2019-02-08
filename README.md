@@ -37,10 +37,10 @@
 	// get output vector for new state
 	fmt.Println(system.Response(x, u))
 
-	// discretize LTI system and propagate state by time step 
+	// discretize LTI system and propagate state by time step dt
 	discrete, err := system.Discretize(dt)
 
-	fmt.Println("x(k+1)=", discrete.Propagate(x, u))
+	fmt.Println("x(k+1)=", discrete.Predict(x, u))
 }
 ```
 
@@ -51,7 +51,7 @@ See example [here](example/lti.go).
 ## More information
 
 For additional materials on state-space models for control theory, check out the following links:
-* A practical to state-space control [here](https://github.com/calcmogul/state-space-guide)
+* A practical guide to state-space control [here](https://github.com/calcmogul/state-space-guide)
 * State-space model impelmentation for Arduinos [here](https://github.com/tomstewart89/StateSpaceControl)
 
 ## Credits

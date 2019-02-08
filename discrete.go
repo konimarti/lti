@@ -43,16 +43,10 @@ func NewDiscrete(A, B, C, D *mat.Dense, dt float64) (*Discrete, error) {
 	}, nil
 }
 
-// Propagate state x(k) by a time step dt to x(k+1) = A_discretized * x + B_discretized * u
-func (d *Discrete) Propagate(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
-
+// Predict predicts  x(k+1) = A_discretized * x(k) + B_discretized * u(k)
+func (d *Discrete) Predict(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	// x(k+1) = A_d * x + B_d * u
-	var xk1, adx, bdu mat.VecDense
-	adx.MulVec(d.Ad, x)
-	bdu.MulVec(d.Bd, u)
-	xk1.AddVec(&adx, &bdu)
-
-	return &xk1
+	return multAndSumOp(d.Ad, x, d.Bd, u)
 }
 
 //Response returns the output vector y(t) = C * x(t) + D * u(t)

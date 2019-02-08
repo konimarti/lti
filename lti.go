@@ -26,5 +26,5 @@ type LTI interface {
 //DiscreteLTI represents a discretized LTI system
 type DiscreteLTI interface {
 	LTI
-	Propagate(x, u *mat.VecDense) *mat.VecDense
+	Predict(x, u *mat.VecDense) *mat.VecDense
 }
