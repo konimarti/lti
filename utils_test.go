@@ -132,3 +132,79 @@ func TestRank(t *testing.T) {
 		}
 	}
 }
+
+func TestCheckControllability(t *testing.T) {
+
+	var config = []struct {
+		A    *mat.Dense
+		B    *mat.Dense
+		Want bool
+	}{
+		{
+			A: mat.NewDense(3, 3, []float64{
+				0, 1, 0,
+				0, 0, 1,
+				0, 0, 0}),
+			B: mat.NewDense(3, 1, []float64{
+				0, 0, 0}),
+			Want: false,
+		},
+		{
+			A: mat.NewDense(2, 2, []float64{
+				0, 1,
+				0, 0}),
+			B: mat.NewDense(2, 1, []float64{
+				0, 1}),
+			Want: true,
+		},
+	}
+
+	for _, cfg := range config {
+		if ok, _ := checkControllability(cfg.A, cfg.B); ok != cfg.Want {
+			fmt.Println("A=", cfg.A)
+			fmt.Println("B=", cfg.B)
+			fmt.Println("received:", ok)
+			fmt.Println("expected:", cfg.Want)
+			t.Error("check controllability failed")
+		}
+	}
+
+}
+
+func TestCheckObservability(t *testing.T) {
+
+	var config = []struct {
+		A    *mat.Dense
+		C    *mat.Dense
+		Want bool
+	}{
+		{
+			A: mat.NewDense(2, 2, []float64{
+				0, 1,
+				0, 0}),
+			C: mat.NewDense(1, 2, []float64{
+				1, 0}),
+			Want: true,
+		},
+		{
+			A: mat.NewDense(3, 3, []float64{
+				0, 1, 0,
+				0, 0, 1,
+				0, 0, 0}),
+			C: mat.NewDense(1, 3, []float64{
+				0, 1, 0}),
+			Want: false,
+		},
+	}
+
+	for _, cfg := range config {
+		if ok, _ := checkObservability(cfg.A, cfg.C); ok != cfg.Want {
+			fmt.Println("A=", cfg.A)
+			fmt.Println("C=", cfg.C)
+			fmt.Println("received:", ok)
+			fmt.Println("expected:", cfg.Want)
+			t.Error("observable failed")
+		}
+	}
+
+}

@@ -82,3 +82,73 @@ func rank(a *mat.Dense) (int, error) {
 	}
 	return rank, nil
 }
+
+//checkControllability checks controllability of the LTI system
+func checkControllability(a *mat.Dense, b *mat.Dense) (bool, error) {
+	// system is controllable if
+	// rank( [B, A B, A^2 B, A^n-1 B] ) = n
+
+	// controllability matrix
+	n, _ := b.Dims()
+
+	var c, ab mat.Dense
+	c.Clone(b)
+	ab.Clone(b)
+
+	// create augmented matrix
+	for i := 0; i < n-1; i++ {
+		ab.Mul(a, &ab)
+		var tmp mat.Dense
+		tmp.Augment(&c, &ab)
+		c.Clone(&tmp)
+	}
+	//fmt.Println(c)
+
+	// calculate rank
+	rank, err := rank(&c)
+	if err != nil {
+		return false, err
+	}
+	//fmt.Println("rank(C)=", rank)
+
+	// check
+	if rank < n {
+		return false, nil
+	}
+	return true, nil
+}
+
+//checkObservability checks observability of the LTI system
+func checkObservability(a *mat.Dense, c *mat.Dense) (bool, error) {
+	// system is observable if
+	// rank( S=[C, C A, C A^2, ..., C A^n-1]' ) = n
+
+	// observability matrix S
+	_, n := c.Dims()
+
+	var sb, ca mat.Dense
+	sb.Clone(c)
+	ca.Clone(c)
+
+	// create stacked matrix
+	for i := 0; i < n-1; i++ {
+		ca.Mul(&ca, a)
+		var tmp mat.Dense
+		tmp.Stack(&sb, &ca)
+		sb.Clone(&tmp)
+	}
+	//fmt.Println("S=", s)
+
+	// calculate rank
+	rank, err := rank(&sb)
+	if err != nil {
+		return false, err
+	}
+	//fmt.Println("rank(S)=", rank)
+
+	// check
+	if rank < n {
+		return false, nil
+	}
+	return true, nil
+}

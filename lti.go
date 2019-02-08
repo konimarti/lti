@@ -13,3 +13,8 @@
 // D: Feedforward matrix
 //
 package lti
+
+type LTI interface {
+	Observable() (bool, error)
+	Controllable() (bool, error)
+}
