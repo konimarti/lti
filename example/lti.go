@@ -35,7 +35,7 @@ func main() {
 
 	// discretize LTI system and propagate state by time step dt
 	dt := 0.1 // dt = time step
-	discrete, err := lti.NewDiscrete(system.A, system.B, dt)
+	discrete, err := system.Discretize(dt)
 	if err != nil {
 		panic(err)
 	}
