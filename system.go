@@ -62,38 +62,13 @@ func NewSystem(A, B, C, D *mat.Dense) (*System, error) {
 //Derivative returns the derivative vetor x'(t) = A * x(t) + B * u(t)
 func (s *System) Derivative(x, u *mat.VecDense) *mat.VecDense {
 	// x'(t) = A * x(t) + B * u(t)
-
-	// A * x(t)
-	var ax mat.VecDense
-	ax.MulVec(s.A, x)
-
-	// B * u(t)
-	var bx mat.VecDense
-	bx.MulVec(s.B, u)
-
-	// xderiv = A x(t) + B u(t)
-	var xderiv mat.VecDense
-	xderiv.AddVec(&ax, &bx)
-
-	return &xderiv
+	return multAndSumOp(s.A, x, s.B, u)
 }
 
 //Response returns the output vector y(t) = C * x(t) + D * u(t)
 func (s *System) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
-
-	// cx = C * x
-	var cx mat.VecDense
-	cx.MulVec(s.C, x)
-
-	// du = D * u
-	var du mat.VecDense
-	du.MulVec(s.D, u)
-
 	// y(t) = C * x(t) + D * u(t)
-	var yk mat.VecDense
-	yk.AddVec(&cx, &du)
-
-	return &yk
+	return multAndSumOp(s.C, x, s.D, u)
 }
 
 // MustControllable checks the controllability
@@ -128,4 +103,9 @@ func (s *System) Observable() (bool, error) {
 	// system is observable if
 	// rank( S=[C, C A, C A^2, ..., C A^n-1]' ) = n
 	return checkObservability(s.A, s.C)
+}
+
+// Discretize discretizes the time-continuous LTI into an explicit time-discrete LTI system
+func (s *System) Discretize(dt float64) (*Discrete, error) {
+	return NewDiscrete(s.A, s.B, s.C, s.D, dt)
 }

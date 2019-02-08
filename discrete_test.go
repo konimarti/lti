@@ -15,7 +15,8 @@ func NewTestDiscrete() (*Discrete, error) {
 		mat.NewDense(1, 1, []float64{0}),          // D
 	)
 	dt := 0.1
-	return NewDiscrete(sys.A, sys.B, dt)
+	//return NewDiscrete(sys.A, sys.B, nil, nil, dt)
+	return sys.Discretize(dt)
 }
 
 func TestPropagate(t *testing.T) {

@@ -208,3 +208,64 @@ func TestCheckObservability(t *testing.T) {
 	}
 
 }
+
+func TestMultAndSumOp(t *testing.T) {
+
+	var config = []struct {
+		A    *mat.Dense
+		X    *mat.VecDense
+		B    *mat.Dense
+		U    *mat.VecDense
+		Want *mat.VecDense
+	}{
+		{
+			A: mat.NewDense(2, 2, []float64{
+				0, 1,
+				0, 0,
+			}),
+			X: mat.NewVecDense(2, []float64{
+				0, 1,
+			}),
+			B: mat.NewDense(2, 2, []float64{
+				1, 0,
+				0, 1,
+			}),
+			U: mat.NewVecDense(2, []float64{
+				1, 0,
+			}),
+			Want: mat.NewVecDense(2, []float64{
+				2, 0,
+			}),
+		},
+		{
+			A: mat.NewDense(3, 3, []float64{
+				0, 1, 0,
+				0, 0, 1,
+				1, 0, 0,
+			}),
+			X: mat.NewVecDense(3, []float64{
+				1, 2, 3,
+			}),
+			B: mat.NewDense(3, 2, []float64{
+				0, 1,
+				1, 0,
+				0, 0,
+			}),
+			U: mat.NewVecDense(2, []float64{
+				3, 2,
+			}),
+			Want: mat.NewVecDense(3, []float64{
+				4, 6, 1,
+			}),
+		},
+	}
+
+	for _, cfg := range config {
+		if sum := multAndSumOp(cfg.A, cfg.X, cfg.B, cfg.U); !mat.EqualApprox(sum, cfg.Want, 1e-6) {
+			fmt.Println("received:", sum)
+			fmt.Println("expected:", cfg.Want)
+			t.Error("Multiplication and Summation operation failed")
+		}
+	}
+
+}

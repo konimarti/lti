@@ -14,7 +14,10 @@
 //
 package lti
 
+import "gonum.org/v1/gonum/mat"
+
 type LTI interface {
 	Observable() (bool, error)
 	Controllable() (bool, error)
+	Response(x, u *mat.VecDense) *mat.VecDense
 }

@@ -16,10 +16,12 @@ import (
 type Discrete struct {
 	Ad *mat.Dense
 	Bd *mat.Dense
+	C  *mat.Dense
+	D  *mat.Dense
 }
 
 //NewDiscrete returns a Discrete struct
-func NewDiscrete(A, B *mat.Dense, dt float64) (*Discrete, error) {
+func NewDiscrete(A, B, C, D *mat.Dense, dt float64) (*Discrete, error) {
 
 	// A_d = exp(A*dt)
 	ad, err := discretize(A, dt)
@@ -36,6 +38,8 @@ func NewDiscrete(A, B *mat.Dense, dt float64) (*Discrete, error) {
 	return &Discrete{
 		Ad: ad,
 		Bd: bd,
+		C:  C,
+		D:  D,
 	}, nil
 }
 
@@ -49,4 +53,10 @@ func (d *Discrete) Propagate(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	xk1.AddVec(&adx, &bdu)
 
 	return &xk1
+}
+
+//Response returns the output vector y(t) = C * x(t) + D * u(t)
+func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
+	// y(t) = C * x(t) + D * u(t)
+	return multAndSumOp(d.C, x, d.D, u)
 }
