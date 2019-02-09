@@ -16,10 +16,13 @@ func IdealDiscretization(A *mat.Dense, dt float64, M *mat.Dense) (*mat.Dense, er
 	}
 
 	// M_d = exp(A*dt) * M
+	var md mat.Dense
 	if M != nil {
-		d.Mul(d, M)
+		md.Mul(d, M)
+	} else {
+		md.Clone(d)
 	}
-	return d, nil
+	return &md, nil
 }
 
 //RealDiscretization returns a discretized matrix Md = Int_0^T exp(A*t) * M dt.
