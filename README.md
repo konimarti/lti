@@ -6,6 +6,7 @@
 
 ```go get github.com/konimarti/lti```
 
+* Work in Progress
 * State-space representation and estimation of linear, time-invariant systems for control theory in Golang
 
 	```math
