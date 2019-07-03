@@ -20,7 +20,7 @@ func IdealDiscretization(A *mat.Dense, dt float64, M *mat.Dense) (*mat.Dense, er
 	if M != nil {
 		md.Mul(d, M)
 	} else {
-		md.Clone(d)
+		md.CloneFrom(d)
 	}
 	return &md, nil
 }

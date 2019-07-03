@@ -43,7 +43,7 @@ func integrate(a *mat.Dense, b *mat.Dense, t float64) (*mat.Dense, error) {
 
 	// Sum_n (AT)^n-1 / n!
 	var x, tmp mat.Dense
-	x.Clone(&at)
+	x.CloneFrom(&at)
 	x.Zero()
 	fac := 1.0
 	for n := 1; n < 10; n++ {
@@ -92,15 +92,15 @@ func checkControllability(a *mat.Dense, b *mat.Dense) (bool, error) {
 	n, _ := b.Dims()
 
 	var c, ab mat.Dense
-	c.Clone(b)
-	ab.Clone(b)
+	c.CloneFrom(b)
+	ab.CloneFrom(b)
 
 	// create augmented matrix
 	for i := 0; i < n-1; i++ {
 		ab.Mul(a, &ab)
 		var tmp mat.Dense
 		tmp.Augment(&c, &ab)
-		c.Clone(&tmp)
+		c.CloneFrom(&tmp)
 	}
 	//fmt.Println(c)
 
@@ -127,15 +127,15 @@ func checkObservability(a *mat.Dense, c *mat.Dense) (bool, error) {
 	_, n := c.Dims()
 
 	var sb, ca mat.Dense
-	sb.Clone(c)
-	ca.Clone(c)
+	sb.CloneFrom(c)
+	ca.CloneFrom(c)
 
 	// create stacked matrix
 	for i := 0; i < n-1; i++ {
 		ca.Mul(&ca, a)
 		var tmp mat.Dense
 		tmp.Stack(&sb, &ca)
-		sb.Clone(&tmp)
+		sb.CloneFrom(&tmp)
 	}
 	//fmt.Println("S=", s)
 
