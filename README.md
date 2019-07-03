@@ -6,7 +6,6 @@
 
 ```go get github.com/konimarti/lti```
 
-* Work in Progress
 * State-space representation and estimation of linear, time-invariant systems for control theory in Golang
 
 	```math
@@ -16,7 +15,7 @@
 	```math
 	 y(t)  = C * x(t) + D * u(t)
 	```
-
+* Can be used as an input for a [Kalman filter](http://github.com/konimarti/kalman). 
 
 ## Usage
 ```go

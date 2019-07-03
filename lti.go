@@ -23,8 +23,8 @@ type LTI interface {
 	Response(x, u *mat.VecDense) *mat.VecDense
 }
 
-//DiscreteLTI represents a discretized LTI system
-type DiscreteLTI interface {
+//Predictor represents a discretized LTI system
+type Predictor interface {
 	LTI
 	Predict(x, u *mat.VecDense) *mat.VecDense
 }
