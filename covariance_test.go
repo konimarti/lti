@@ -21,7 +21,8 @@ func TestCovariancePredict(t *testing.T) {
 		0, 1, 0,
 		0, 0, 1,
 	})
-	pNext := systemNoise.Predict(p, nil)
+	var pmt, mpmt mat.Dense
+	pNext := systemNoise.Predict(p, nil, &pmt, &mpmt)
 
 	expected1 := mat.NewDense(3, 3, []float64{
 		1, 0, 0,
@@ -40,7 +41,8 @@ func TestCovariancePredict(t *testing.T) {
 		0.1, 0.2, 0.1,
 		0.3, 0.1, 0.1,
 	})
-	pNext = systemNoise.Predict(p, noise)
+
+	pNext = systemNoise.Predict(p, noise, &pmt, &mpmt)
 
 	expected2 := mat.NewDense(3, 3, []float64{
 		1.1, 0.1, 0.3,

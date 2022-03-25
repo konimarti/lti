@@ -16,10 +16,11 @@ import (
 //
 //
 type System struct {
-	A *mat.Dense
-	B *mat.Dense
-	C *mat.Dense
-	D *mat.Dense
+	A           *mat.Dense
+	B           *mat.Dense
+	C           *mat.Dense
+	D           *mat.Dense
+	ax, bu, sum mat.VecDense // Workspace for multAndSumOp
 }
 
 //NewSystem returns a System struct and checks the matrix dimensions
@@ -62,13 +63,13 @@ func NewSystem(A, B, C, D *mat.Dense) (*System, error) {
 //Derivative returns the derivative vetor x'(t) = A * x(t) + B * u(t)
 func (s *System) Derivative(x, u *mat.VecDense) *mat.VecDense {
 	// x'(t) = A * x(t) + B * u(t)
-	return multAndSumOp(s.A, x, s.B, u)
+	return multAndSumOp(s.A, x, s.B, u, s.ax, s.bu, s.sum)
 }
 
 //Response returns the output vector y(t) = C * x(t) + D * u(t)
 func (s *System) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	// y(t) = C * x(t) + D * u(t)
-	return multAndSumOp(s.C, x, s.D, u)
+	return multAndSumOp(s.C, x, s.D, u, s.ax, s.bu, s.sum)
 }
 
 // MustControllable checks the controllability

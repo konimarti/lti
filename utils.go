@@ -154,18 +154,15 @@ func checkObservability(a *mat.Dense, c *mat.Dense) (bool, error) {
 }
 
 // multAndSumOp multiplies A * x and B * u and returns the sum
-func multAndSumOp(a *mat.Dense, x *mat.VecDense, b *mat.Dense, u *mat.VecDense) *mat.VecDense {
+func multAndSumOp(a *mat.Dense, x *mat.VecDense, b *mat.Dense, u *mat.VecDense, ax, bu, sum mat.VecDense) *mat.VecDense {
 
 	// ax = A * x
-	var ax mat.VecDense
 	ax.MulVec(a, x)
 
 	// bu = B * u
-	var bu mat.VecDense
 	bu.MulVec(b, u)
 
 	// sum = A * x + B * u
-	var sum mat.VecDense
 	sum.AddVec(&ax, &bu)
 
 	return &sum
