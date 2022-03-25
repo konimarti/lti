@@ -212,11 +212,12 @@ func TestCheckObservability(t *testing.T) {
 func TestMultAndSumOp(t *testing.T) {
 
 	var config = []struct {
-		A    *mat.Dense
-		X    *mat.VecDense
-		B    *mat.Dense
-		U    *mat.VecDense
-		Want *mat.VecDense
+		A           *mat.Dense
+		X           *mat.VecDense
+		B           *mat.Dense
+		U           *mat.VecDense
+		Want        *mat.VecDense
+		ax, bu, sum mat.VecDense
 	}{
 		{
 			A: mat.NewDense(2, 2, []float64{
@@ -261,7 +262,7 @@ func TestMultAndSumOp(t *testing.T) {
 	}
 
 	for _, cfg := range config {
-		if sum := multAndSumOp(cfg.A, cfg.X, cfg.B, cfg.U); !mat.EqualApprox(sum, cfg.Want, 1e-6) {
+		if sum := multAndSumOp(cfg.A, cfg.X, cfg.B, cfg.U, cfg.ax, cfg.bu, cfg.sum); !mat.EqualApprox(sum, cfg.Want, 1e-6) {
 			fmt.Println("received:", sum)
 			fmt.Println("expected:", cfg.Want)
 			t.Error("Multiplication and Summation operation failed")

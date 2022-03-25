@@ -17,15 +17,14 @@ func NewCovariance(md *mat.Dense) *Covariance {
 //Predict propagates the covariance p(k) to p(k+1)
 //according to p(k+1) = Md * p(k) * Md^T;
 //additionally noise is added if not nil
-func (c *Covariance) Predict(p *mat.Dense, noise *mat.Dense) *mat.Dense {
+func (c *Covariance) Predict(p *mat.Dense, noise *mat.Dense, pmt, mpmt *mat.Dense) *mat.Dense {
 	// p(k+1) = m * p(k) * m^T + noise
-	var pmt, mpmt mat.Dense
 	pmt.Mul(p, c.Md.T())
-	mpmt.Mul(c.Md, &pmt)
+	mpmt.Mul(c.Md, pmt)
 
 	if noise != nil {
-		mpmt.Add(&mpmt, noise)
+		mpmt.Add(mpmt, noise)
 	}
 
-	return &mpmt
+	return mpmt
 }

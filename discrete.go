@@ -14,10 +14,11 @@ import (
 //
 //
 type Discrete struct {
-	Ad *mat.Dense
-	Bd *mat.Dense
-	C  *mat.Dense
-	D  *mat.Dense
+	Ad          *mat.Dense
+	Bd          *mat.Dense
+	C           *mat.Dense
+	D           *mat.Dense
+	ax, bu, sum mat.VecDense // Workspace for multAndSumOp
 }
 
 //NewDiscrete returns a Discrete struct
@@ -46,13 +47,14 @@ func NewDiscrete(A, B, C, D *mat.Dense, dt float64) (*Discrete, error) {
 // Predict predicts  x(k+1) = A_discretized * x(k) + B_discretized * u(k)
 func (d *Discrete) Predict(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	// x(k+1) = A_d * x + B_d * u
-	return multAndSumOp(d.Ad, x, d.Bd, u)
+
+	return multAndSumOp(d.Ad, x, d.Bd, u, d.ax, d.bu, d.sum)
 }
 
 //Response returns the output vector y(t) = C * x(t) + D * u(t)
 func (d *Discrete) Response(x *mat.VecDense, u *mat.VecDense) *mat.VecDense {
 	// y(t) = C * x(t) + D * u(t)
-	return multAndSumOp(d.C, x, d.D, u)
+	return multAndSumOp(d.C, x, d.D, u, d.ax, d.bu, d.sum)
 }
 
 // Controllable checks the controllability of the LTI system.
